@@ -1,0 +1,30 @@
+{
+  "name": "ts_proj",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "@types/prompt-sync": "^4.2.3",
+    "langchain": "^0.3.19",
+    "node-fetch": "^3.3.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@langchain/ollama": "^0.2.0",
+    "dotenv": "^16.4.7",
+    "install": "^0.13.0",
+    "npm": "^11.2.0",
+    "ollama": "^0.5.14",
+    "prompt-sync": "^4.2.0",
+    "zod": "^3.24.2"
+  }
+}
