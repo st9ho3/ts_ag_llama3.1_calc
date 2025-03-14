@@ -1,3 +1,4 @@
+import { tools } from "./api";
 interface Coord {
     lon: number;
     lat: number;
@@ -64,5 +65,11 @@ export interface Numbers {
   a: number,
   b: number
 }
+
+export type FunctionCall = {
+  name: string; // ensures the name is one of the keys in tools
+  args: any; // use a more specific type if you have one
+} | undefined
+
   
   
