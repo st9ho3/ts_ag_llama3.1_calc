@@ -1,9 +1,10 @@
 import { ChatOllama } from "@langchain/ollama";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { tools } from "./tools";
-import { message2 } from "./messages";
+import { weatherPrompt } from "./messages";
 
-const newPrompt = "I bought 4 eggs that each one was cost 1 euro. How much do they cost in total?";
+
+const newPrompt = "Im going to LA to day what should i get with me?";
 
 const callLLM = async (prompt: string) => {
   const llm = new ChatOllama({
@@ -13,26 +14,33 @@ const callLLM = async (prompt: string) => {
   });
 
   const llmWithTools = llm.bindTools(tools);
-
+  
+//These are the messages one the prompt and one for the system prompt
   const messages = [
-    new SystemMessage(message2),
+    new SystemMessage(weatherPrompt),
     new HumanMessage(prompt),
   ];
 
   const response = await llmWithTools.invoke(messages);
 
+//We can change the tool here
   const toolsByName = {
     addTwoNumbers: tools[0],
     subtracktTwoNumbers: tools[1],
     multiplyTwoNumbers: tools[2],
     divideTwoNumbers: tools[3],
+    getWeather: tools[4]
   };
+
+ /*  const externalTools = {
+    getWeatherData: apiTools[0]
+  } */
 
   if (response.tool_calls) {
     for (const toolCall of response.tool_calls) {
       const selectedTool = toolsByName[toolCall.name as keyof typeof toolsByName];
       const toolMessage = await selectedTool.invoke(toolCall);
-      console.log(`Calling the ${toolCall.name} tool`);
+      console.log(`Calling the ${toolCall.name} tool...`);
       messages.push(toolMessage);
     }
   } 

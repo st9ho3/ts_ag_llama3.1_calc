@@ -1,6 +1,7 @@
 import { Numbers } from "../types";
 import { z } from "zod";
 import { tool } from "@langchain/core/tools";
+import { getWeather } from "../api";
 
 // Function to add two numbers
 const addTwoNumbers = async ({ a, b }: Numbers): Promise<number> => {
@@ -76,10 +77,26 @@ const divideTwoNumbersTool = tool(divideTwoNumbers, {
   description: "This tool takes two numbers 'a' and 'b' as input and returns the result of dividing 'a' by 'b'.",
 });
 
+const getWeatherSchema = z.object(
+  {a: z.string()}
+)
+
+const getWeatherTooll = tool(getWeather, {
+  name: "getWeather",
+  schema: getWeatherSchema,
+  description: "This tool is built to provide real-time weather information for a specified city. By accepting a city name as input, the function queries a weather API endpoint to retrieve current conditions such as temperature, humidity, wind speed, and weather description (clear, cloudy, etc.). "
+   
+})
+
+export const apiTools = [
+  getWeatherTooll
+]
+
 export const tools = [
     addTwoNumbersTool,
     subtracktTwoNumbersTool,
     multiplyTwoNumbersTool,
-    divideTwoNumbersTool
+    divideTwoNumbersTool,
+    getWeatherTooll
 ]
 

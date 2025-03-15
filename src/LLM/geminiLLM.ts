@@ -2,7 +2,7 @@ import {  GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import dotenv from 'dotenv'
 import { tools } from "../api";
 import { FunctionCall } from "../types";
-import { instruction } from "./messages";
+import { weatherPrompt } from "./messages";
 
 dotenv.config()
 
@@ -12,7 +12,7 @@ const model =
     genAI ? genAI.getGenerativeModel(
     { 
         model: "gemini-2.0-flash",
-        systemInstruction: "You're my personal assistant. You need to always answer to me even if I'm asking something irrelevant.Because your also my friend.", 
+        systemInstruction: weatherPrompt, 
         tools: [{
             functionDeclarations: [
                 {
@@ -39,7 +39,7 @@ const model =
 
 if (model) {
     const chat = model.startChat();
-    const prompt = "whats the wheather in chicago?"
+    const prompt = "Im going to LA to day what should i get with me?"
     
     const result = await chat.sendMessage(prompt)
 
