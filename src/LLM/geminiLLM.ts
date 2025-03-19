@@ -1,65 +1,88 @@
-import {  GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
-import dotenv from 'dotenv'
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import dotenv from "dotenv";
 import { tools } from "../api";
 import { FunctionCall } from "../types";
 import { weatherPrompt } from "./messages";
 
-dotenv.config()
+// Load environment variables from .env file
+dotenv.config();
 
-const calGemini = async(): Promise<void> => {
-const genAI = process.env.LLM_API ?  new GoogleGenerativeAI(process.env.LLM_API) : undefined
-const model = 
-    genAI ? genAI.getGenerativeModel(
-    { 
+/**
+ * Asynchronously interacts with Google's Generative AI to provide weather-based advice.
+ * Uses the Gemini 2.0 Flash model to process a prompt and retrieve weather data for a specified city.
+ * @returns {Promise<void>} Resolves when the AI response is logged or an error message is displayed.
+ */
+const calGemini = async (): Promise<void> => {
+  // Initialize the Google Generative AI instance with an API key from environment variables
+  const genAI = process.env.LLM_API
+    ? new GoogleGenerativeAI(process.env.LLM_API)
+    : undefined;
+
+  // Configure the generative model with a specific model, system instructions, and tools
+  const model = genAI
+    ? genAI.getGenerativeModel({
         model: "gemini-2.0-flash",
-        systemInstruction: weatherPrompt, 
-        tools: [{
+        systemInstruction: weatherPrompt, // Predefined instruction for weather-related queries
+        tools: [
+          {
             functionDeclarations: [
-                {
-                    name: 'retrieveTheWeather',
-                    parameters: {
-                        type: SchemaType.OBJECT,
-                        description: 'Searches and gets weather data',
-                        properties: {
-                            a: {
-                                type: SchemaType.STRING,
-                                description: 'the city name for which we make the research. needs to pass as a string'
-                            }
-                        },
-                        required: ['a']
-                    }
-                }
-            ]
-        }]
-        
-    }) 
-    : undefined
+              {
+                name: "retrieveTheWeather",
+                parameters: {
+                  type: SchemaType.OBJECT,
+                  description: "Searches and gets weather data",
+                  properties: {
+                    a: {
+                      type: SchemaType.STRING,
+                      description:
+                        "The city name for which weather data is retrieved. Must be a string.",
+                    },
+                  },
+                  required: ["a"],
+                },
+              },
+            ],
+          },
+        ],
+      })
+    : undefined;
 
+  // Proceed only if the model is successfully initialized
+  if (model) {
+    const chat = model.startChat(); // Start a chat session with the model
+    const prompt = "Im going to LA to day what should i get with me?"; // User prompt
 
+    // Send the prompt to the model and await the response
+    const result = await chat.sendMessage(prompt);
 
-if (model) {
-    const chat = model.startChat();
-    const prompt = "Im going to LA to day what should i get with me?"
-    
-    const result = await chat.sendMessage(prompt)
+    // Extract any function calls from the response
+    const functionInArray = result.response.functionCalls();
+    const cleanFunction: FunctionCall | undefined = functionInArray
+      ? functionInArray[0]
+      : undefined;
 
-    const functionInArray = result.response.functionCalls()
-    const cleanFunction: FunctionCall = functionInArray ? functionInArray[0] : undefined
-
-    if (cleanFunction ) {
-        const apiResponse = await tools[cleanFunction.name as keyof typeof tools](cleanFunction.args)
-        const sendResponse = await chat.sendMessage([{functionResponse: {
-            name: 'retrieveTheWeather',
-            response: apiResponse ? apiResponse : {}
-        }}])
-        console.log(sendResponse.response.text())
+    if (cleanFunction) {
+      // Call the corresponding tool function with the provided arguments
+      const apiResponse = await tools[cleanFunction.name as keyof typeof tools](
+        cleanFunction.args
+      );
+      // Send the tool's response back to the chat session
+      const sendResponse = await chat.sendMessage([
+        {
+          functionResponse: {
+            name: "retrieveTheWeather",
+            response: apiResponse ? apiResponse : {},
+          },
+        },
+      ]);
+      console.log(sendResponse.response.text()); // Log the final AI response
     } else {
-        console.log(result.response.text())
+      console.log(result.response.text()); // Log the response if no function was called
     }
-    
-} else {
-    console.log("Couldn't connect to API");
+  } else {
+    console.log("Couldn't connect to API"); // Log an error if model initialization fails
+  }
+};
 
-}}
-
-calGemini()
+// Execute the function
+calGemini();

@@ -4,11 +4,11 @@ import { tools } from "./tools";
 import { weatherPrompt } from "./messages";
 
 
-const newPrompt = "Im going to LA to day what should i get with me?";
+const newPrompt = "Ihad initially 10$. I bought an apple for 2$. I bought a banana for 1$. My brother gave me 2$. Last i bought an orange for 3$. How much money do i have?";
 
 const callLLM = async (prompt: string) => {
   const llm = new ChatOllama({
-    model: "llama3.1:latest",
+    model: "qwen2.5:7b",
     baseUrl: "http://localhost:11434",
     temperature: 1,
   });
