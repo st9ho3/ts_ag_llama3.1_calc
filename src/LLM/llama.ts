@@ -17,7 +17,7 @@ const newPrompt = "I had initially 10$. I bought an apple for 2$. I bought a ban
 const callLLM = async (prompt: string): Promise<void> => {
   // Initialize the ChatOllama model with specific configuration
   const llm = new ChatOllama({
-    model: "qwen2.5:7b", // Model identifier for Ollama
+    model: "llama3.1:7b", // Model identifier for Ollama
     baseUrl: "http://localhost:11434", // Local server URL for Ollama
     temperature: 1, // Controls randomness of the model's output (1 = default creativity)
   });
