@@ -64,5 +64,3 @@ The `package.json` defines a start script.
     ```bash
     ts-node src/LLM/geminiLLM.ts
     ```
-
-## Project Structure
